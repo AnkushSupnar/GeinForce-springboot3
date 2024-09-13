@@ -191,7 +191,22 @@ public class RESTServerDockController {
             	System.out.println("Got download complex file for protein====="+fileName);
             	
             	String filePathString = dockService.getProteinComplexPath(fileName,jobName,email);
-            	return null;
+            	Path filePath = Paths.get(filePathString).normalize();
+            	Resource resource = new UrlResource(filePath.toUri());
+            	 if (resource.exists()) {
+            		 System.out.println("Resource complex protein is exist");
+                     String contentType = "application/octet-stream"; // Default content type
+                     return ResponseEntity.ok()
+                             .contentType(MediaType.parseMediaType(contentType))
+                             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                             .body(resource);
+
+            		 
+            	 }
+            	 else {
+                     return ResponseEntity.notFound().build();
+                 }
+            	
             }
             // Use FileService to construct the file path
             String filePathString = fileService.getFilePathFromName(jobName, email, fileType, fileName);

@@ -83,4 +83,19 @@ public class AuthenticationController {
 	    }
 	}
 	
+	@PostMapping("/validateUser")
+    public ResponseEntity<String> validateToken(@RequestHeader("Authorization") String authHeader) {
+		System.out.println("Validating User token------------------------------------");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().body("Invalid Authorization header");
+        }
+
+        String token = authHeader.substring(7); // Remove "Bearer " prefix
+
+        if (jwtUtil.validateToken(token)) {
+            return ResponseEntity.ok("Token is valid");
+        } else {
+            return ResponseEntity.ok("Token is invalid or has expired");
+        }
+    }
 }

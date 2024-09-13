@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.geinforce.dto.Coordinates;
 import com.geinforce.model.Job;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,6 +25,9 @@ public class DockService {
     AutoDockVinaService autoDockVinaService;
     @Autowired
     FileService fileService;
+    
+    @Autowired
+    ComplexFile complexFile;
 
     @Async
     public Coordinates getGrid(String jobName, String email) {
@@ -72,7 +76,7 @@ public class DockService {
 			String ligandComplexFolderPath = fileService.getFilePath(jobName,email,"complex_lig");
 			System.out.println("Ligand_complex path=========="+ligandComplexFolderPath);
 			
-			String ligandFilePath = ligandComplexFolderPath+(fileName.replace("protein_", ""));
+			String ligandFilePath = ligandComplexFolderPath+File.separator+(fileName.replace("protein_", ""));
 			System.out.println("Got ligand file path ==========="+ligandFilePath);
 			
 			
@@ -90,15 +94,15 @@ public class DockService {
 		        } else {
 		            System.out.println("Folder already exists: " + path);
 		        }
-			
-			
+			//return complexFile.combineProteinAndLigand(proteinFilePath, ligandFilePath, proteinComplexFolder);
+			return complexFile.generateComplex(proteinFilePath, ligandFilePath, proteinComplexFolder);
 		}catch(Exception e) {
 			System.out.println("Error in getProteinComplexPath --------------"+e.getMessage());
 			return "";
 		}
 		
 		
-		return "";
+		//return "";
 	}
 
 }

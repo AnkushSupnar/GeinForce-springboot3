@@ -1,6 +1,7 @@
 package com.geinforce.util;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,10 +45,26 @@ public class JwtUtil {
     }
 
     public String generateToken(String username) {
-        return createToken(username);
+    	
+        //return createToken(username);
+    	String token = createToken(username);
+        Claims claims = Jwts.parser()
+            .setSigningKey(DatatypeConverter.parseBase64Binary(secret))
+            .parseClaimsJws(token)
+            .getBody();
+        
+        Date issuedAt = claims.getIssuedAt();
+        Date expiration = claims.getExpiration();
+        
+        System.out.println("Token issued at: " + issuedAt);
+        System.out.println("Token expires at: " + expiration);
+        System.out.println("Token duration: " + (expiration.getTime() - issuedAt.getTime()) / 1000 + " seconds");
+        
+        return token;
     }
 
     private String createToken(String subject) {
+    	expiration=60L;
         return Jwts.builder()
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
@@ -59,5 +76,15 @@ public class JwtUtil {
     public Boolean validateToken(String token, String username) {
         final String extractedUsername = extractUsername(token);
         return (extractedUsername.equals(username) && !isTokenExpired(token));
+    }
+    public Boolean validateToken(String token) {
+        try {
+            Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(secret)).parseClaimsJws(token);
+            return !isTokenExpired(token);
+        } catch (ExpiredJwtException e) {
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
