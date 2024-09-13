@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Geindock Suite2</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/css/bootstrap.min.css" integrity="sha512-rt/SrQ4UNIaGfDyEXZtNcyWvQeOq0QLygHluFQcSjaGB04IxWhal71tKuzP6K8eYXYB6vJV4pHkXcmFGGQ1/0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: #1E2A78;
+        }
+        .navbar-brand, .nav-link {
+            color: #ffffff !important;
+        }
+        .main-content {
+            margin-top: 2rem;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        .card-header {
+            background-color: #1E2A78;
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        .drop-container {
+            border: 2px dashed #1E2A78;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .drop-container:hover {
+            background-color: #e9ecef;
+            border-color: #0d47a1;
+        }
+        .drop-title {
+            color: #1E2A78;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .file-icon {
+            font-size: 3rem;
+            color: #1E2A78;
+            margin-bottom: 1rem;
+        }
+        .btn-primary {
+            background-color: #1E2A78;
+            border-color: #1E2A78;
+        }
+        .btn-primary:hover {
+            background-color: #0d47a1;
+            border-color: #0d47a1;
+        }
+        .ngl-viewer {
+            background-color: #e9ecef;
+            border-radius: 10px;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #6c757d;
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            visibility: hidden;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #1E2A78;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading" class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+
+
+
+
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Geindock Suite</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Documentation</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Support</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-content">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Protein Preparation</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="drop-container" id="protein-drop-container">
+                            <i class="fas fa-dna file-icon"></i>
+                            <p class="drop-title">Drop or Choose Protein File</p>
+                            <input type="file" id="protein-file" accept=".pdb,.mol2" style="display: none;">
+                        </div>
+                        <button class="btn btn-primary btn-block mt-3" onclick="uploadFile('protein')">Upload Protein</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Ligand Preparation</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="drop-container" id="ligand-drop-container">
+                            <i class="fas fa-capsules file-icon"></i>
+                            <p class="drop-title">Drop or Choose Ligand File</p>
+                            <input type="file" id="ligand-file" accept=".mol2,.sdf" style="display: none;">
+                        </div>
+                        <button class="btn btn-primary btn-block mt-3" onclick="uploadFile('ligand')">Upload Ligand</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">NGL Viewer</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="ngl-viewer">
+                            NGL viewer will be displayed here
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js" integrity="sha512-ubuT8Z88WxezgSqf3RLuNi5lmjstiJcyezx34yIU2gAHonIi27Na7atqzUZCOoY4CExaoFumzOsFQ2Ch+I/HCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/js/bootstrap.min.js" integrity="sha512-7rusk8kGPFynZWu26OKbTeI+QPoYchtxsmPeBqkHIEXJxeun4yJ4ISYe7C6sz9wdxeE1Gk3VxsIWgCZTc+vX3g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        function showLoading() {
+            document.getElementById('loading').style.visibility = 'visible';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.visibility = 'hidden';
+        }
+
+        function uploadFile(type) {
+            showLoading();
+            // Simulating file upload
+            setTimeout(() => {
+                hideLoading();
+                alert(`${type.charAt(0).toUpperCase() + type.slice(1)} file uploaded successfully!`);
+            }, 2000);
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            ['protein', 'ligand'].forEach(type => {
+                const dropContainer = document.getElementById(`${type}-drop-container`);
+                const fileInput = document.getElementById(`${type}-file`);
+
+                dropContainer.addEventListener('click', () => fileInput.click());
+
+                dropContainer.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropContainer.classList.add('drag-active');
+                });
+
+                dropContainer.addEventListener('dragleave', () => {
+                    dropContainer.classList.remove('drag-active');
+                });
+
+                dropContainer.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropContainer.classList.remove('drag-active');
+                    fileInput.files = e.dataTransfer.files;
+                    updateFileName(type);
+                });
+
+                fileInput.addEventListener('change', () => updateFileName(type));
+            });
+        });
+
+        function updateFileName(type) {
+            const fileInput = document.getElementById(`${type}-file`);
+            const dropTitle = document.querySelector(`#${type}-drop-container .drop-title`);
+            if (fileInput.files.length > 0) {
+                dropTitle.textContent = fileInput.files[0].name;
+            } else {
+                dropTitle.textContent = `Drop or Choose ${type.charAt(0).toUpperCase() + type.slice(1)} File`;
+            }
+        }
+    </script>
+</body>
+</html>

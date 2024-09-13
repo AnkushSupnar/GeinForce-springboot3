@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Geindock Suite</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="assets/bootstrap/bootstrap.min.css"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+      integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+      }
+
+      .main-content {
+        margin-top: 2rem;
+      }
+      #viewport1,
+      #view3d_lig {
+        width: 100%;
+        height: 100%;
+        min-height: 300px;
+      }
+      .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1rem;
+      }
+      .card-body-fixed {
+        height: 345px;
+      }
+      .card-header {
+        background-color: #1e2a78;
+        background-color: #bbdefb;
+        color: #1e2a78;
+        border-radius: 10px 10px 0 0 !important;
+        font-size: 0.9rem; /* Reduced font size */
+      }
+      .card-header h5 {
+        font-size: 1rem;
+        margin-bottom: 0;
+      }
+      .drop-container {
+        border: 2px dashed #1e2a78;
+        border: 2px dashed #bbdefb;
+        border-radius: 10px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+      .drop-container:hover {
+        background-color: #e9ecef;
+        border-color: #0d47a1;
+      }
+      .drop-title {
+        color: #1e2a78;
+        font-size: 1.2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+      }
+      .file-icon {
+        font-size: 2rem;
+        color: #1e2a78;
+        margin-bottom: 1rem;
+      }
+      .btn-primary {
+        background-color: #1e2a78;
+        border-color: #1e2a78;
+      }
+      .btn-primary:hover {
+        background-color: #0d47a1;
+        border-color: #0d47a1;
+      }
+      .ngl-viewer {
+        background-color: #e9ecef;
+        border-radius: 10px;
+        height: 500px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #6c757d;
+      }
+      .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        visibility: hidden;
+      }
+      .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #1e2a78;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+       /* New styles for the table */
+       .table-container {
+        margin-top: 2rem;
+        overflow-x: auto;
+      }
+      .material-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background-color: #fff;
+        box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+        border-radius: 4px;
+      }
+      .material-table th,
+      .material-table td {
+        padding: 15px;
+        text-align: left;
+      }
+      .material-table thead {
+        background-color: #3f51b5;
+        background-color: #bbdefb;
+        color: white;
+        color: black;
+      }
+      .material-table th {
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .material-table tbody tr:nth-child(even) {
+        background-color: #f5f5f5;
+      }
+      .material-table tbody tr:hover {
+        background-color: #eeeeee;
+      }
+      .status-pending {
+        color: #ff9800;
+      }
+      .status-complete {
+        color: #4caf50;
+      }
+      .status-failed {
+        color: #f44336;
+      }
+      .btn-action {
+        padding: 5px 10px;
+        margin: 2px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      .btn-view {
+        background-color: #2196f3;
+        color: white;
+      }
+      .btn-delete {
+        padding: 5px 10px;
+        margin: 2px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        
+      }
+      .btn-action:hover {
+        opacity: 0.8;
+      }
+
+
+
+
+      
+    </style>
+  </head>
+  <body>
+    <div id="loading" class="loading-overlay">
+      <div class="loading-spinner"></div>
+    </div>
+
+    <div id="navbar-placeholder" class="container"></div>
+
+    <div class="jumbotron bg-light" style="margin-top: 5px; padding-top: 5px">
+      <div class="container mt-0">
+        <div class="row">
+          <div class="col-12">
+              <div class="card text-center mb-4">
+                  <div class="card-header">
+                      <h5 class="mb-0">GeinDock Suite</h5>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+
+        <div class="row">
+          <div class="col-md-4" style="width: 100%; height: 300px !important">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="mb-0">Protein Preparation</h5>
+              </div>
+              <div class="card-body card-body-fixed">
+                <div class="drop-container" id="protein-drop-container">
+                  <i class="fas fa-dna file-icon"></i>
+                  <p class="drop-title">Drop or Choose Protein File</p>
+                  <input
+                    type="file"
+                    id="protein-file"
+                    accept=".pdb,.mol2"
+                    style="display: none"
+                  />
+                </div>
+                <button
+                  class="btn btn-primary btn-block mt-3"
+                  onclick="uploadFile('protein')"
+                >
+                  Upload Protein
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-8">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="mb-0">Protein Viewer</h5>
+              </div>
+              <div class="card-body">
+                <div id="viewport1"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mt-0">
+          <div class="col-md-4">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="mb-0">Ligand Preparation</h5>
+              </div>
+              <div class="card-body card-body-fixed">
+                <div class="drop-container" id="ligand-drop-container">
+                  <i class="fas fa-capsules file-icon"></i>
+                  <!--<p class="drop-title">Drop or Choose Ligand File</p>-->
+                  <p class="drop-title">Please select a ligand file in one of the following formats: mol2, mol, sdf, or pdb.</p>
+                  <input
+                    type="file"
+                    id="ligand-file"
+                    accept=".pdb,.mol2,.sdf"
+                    style="display: none"
+                  />
+                </div>
+                <button
+                  class="btn btn-primary btn-block mt-3"
+                  onclick="uploadFile('ligand')"
+                >
+                  Upload Ligand
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-8">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="mb-0">Ligand Viewer</h5>
+              </div>
+              <div class="card-body">
+                <div id="view3d_lig"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mt-0">
+          <button class="btn btn-primary shadow mr-2" onclick="startDocking()">Start Docking</button>
+          <button class="btn btn-primary shadow mr-2" onclick="startDocking()">New Job</button>
+          <button class="btn btn-primary shadow mr-2" onclick="startDocking()">Reset</button>
+            
+        </div>
+        <div class="row mt-4">
+            <div class="col-12">
+              <div class="table-container">
+                <table class="material-table" id="jobTable">
+                  <thead>
+                    <tr>
+                      <th>Submit</th>
+                      <th>Protein</th>
+                      <th>Ligand</th>
+                      <th>Job Type</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  <!--  <tr>
+                      <td>2023-09-01</td>
+                      <td>Protein A</td>
+                      <td>Ligand X</td>
+                      <td>Docking</td>
+                      <td><span class="status-pending">Pending</span></td>
+                      <td>
+                        <button type="button" class="btn btn-outline-primary">View</button>
+                        <button type="button" class="btn btn-outline-success">Email</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>2023-08-30</td>
+                      <td>Protein B</td>
+                      <td>Ligand Y</td>
+                      <td>Analysis</td>
+                      <td><span class="status-complete">Complete</span></td>
+                      <td>
+                        <button type="button" class="btn btn-outline-primary">View</button>
+                        <button type="button" class="btn btn-outline-success">Email</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>2023-08-29</td>
+                      <td>Protein C</td>
+                      <td>Ligand Z</td>
+                      <td>Simulation</td>
+                      <td><span class="status-failed">Failed</span></td>
+                      <td>
+                        <button type="button" class="btn btn-outline-primary">View</button>
+                        <button type="button" class="btn btn-outline-success">Email</button>
+                      </td>
+                    </tr>-->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="assets/js/jquery-3.2.1.slim.min.js"></script>
+    <script src="assets/js/popper.min.js" crossorigin="anonymous"></script>
+    <script src="assets/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    <script src="assets/js/jquery-3.5.1.min.js"></script>
+    <script src="assets/js/ngl.js"></script>
+    <script>
+    // Call this function when the window loads
+window.onload = async function() {
+  const token = localStorage.getItem('jwtToken');
+  const isValid = await isJwtTokenValid();
+  console.log('token',token)
+  if (!token || !isValid) {
+        // Token not found, redirect to login page
+        console.log('No JWT token found. Redirecting to login page...');
+        window.location.href = 'login.html';
+    } else {
+        // Token found, proceed with loading the page content
+        console.log('JWT token found. Loading page content...');
+        getJobsAndAddToTable();
+    }
+
+  //  getJobsAndAddToTable();
+};
+
+
+
+      $(function () {
+        $("#navbar-placeholder").load("nav.html");
+      });
+
+      function showLoading() {
+        document.getElementById("loading").style.visibility = "visible";
+      }
+
+      function hideLoading() {
+        document.getElementById("loading").style.visibility = "hidden";
+      }
+
+      function uploadFile(type) {
+        const fileInput = document.getElementById(`${type}-file`);
+        const dropTitle = document.querySelector(
+          `#${type}-drop-container .drop-title`
+        );
+        const token = localStorage.getItem("jwtToken");
+
+      
+
+        if (!token) {
+          alert("No JWT token found. Please log in again.");
+          return;
+        }
+
+        if (!fileInput.files || fileInput.files.length === 0) {
+         // alert("Please select a file first.");
+          alert(` Please upload a ${type} file to proceed.`);
+          return;
+        }
+
+        const file = fileInput.files[0];
+        let jobName = localStorage.getItem("jobName") || new Date().getTime();
+        localStorage.setItem("jobName", jobName);
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("jobName", jobName);
+
+        if (type === "protein") {
+          let data = {
+            center: {
+                      x: 0,
+                      y: 0,
+                      z: 0
+              },
+            size: {
+                    x: 0,
+                    y: 0,
+                    z: 0
+              }
+          }
+
+
+
+          formData.append("coordinates", JSON.stringify(data));
+        }
+
+        showLoading();
+
+        const uploadUrl =
+          type === "protein"
+            ? "/api/serverDockUpload"
+            : "/api/serverDockUploadLigand";
+
+        fetch(uploadUrl, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        })
+          .then((response) => {
+            if (!response.ok) {
+              return response.text().then((text) => {
+                throw new Error(`Network response was not ok: ${text}`);
+              });
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log("Upload successful:", data);
+            hideLoading();
+            alert(
+              `${
+                type.charAt(0).toUpperCase() + type.slice(1)
+              } file uploaded successfully`
+            );
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            hideLoading();
+            if (
+              error.message.includes(
+                "JWT strings must contain exactly 2 period characters"
+              )
+            ) {
+              alert("Invalid token. Please log in again.");
+              localStorage.removeItem("jwtToken");
+            } else {
+              alert(`Error uploading ${type} file: ${error.message}`);
+            }
+          });
+      }
+      document.addEventListener("DOMContentLoaded", (event) => {
+        ["protein", "ligand"].forEach((type) => {
+          const dropContainer = document.getElementById(
+            `${type}-drop-container`
+          );
+          const fileInput = document.getElementById(`${type}-file`);
+
+          dropContainer.addEventListener("click", () => fileInput.click());
+
+          dropContainer.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            dropContainer.classList.add("drag-active");
+          });
+
+          dropContainer.addEventListener("dragleave", () => {
+            dropContainer.classList.remove("drag-active");
+          });
+
+          dropContainer.addEventListener("drop", (e) => {
+            e.preventDefault();
+            dropContainer.classList.remove("drag-active");
+            fileInput.files = e.dataTransfer.files;
+            updateFileName(type);
+            // alert(type);
+            if (type == "protein") {
+              loadProtein(fileInput);
+            }
+            if (type == "ligand") {
+              loadLigand(fileInput);
+            }
+          });
+
+          fileInput.addEventListener("change", () => {
+            updateFileName(type);
+            // alert(type);
+            if (type === "protein") {
+              loadProtein(fileInput);
+            }
+            if (type == "ligand") {
+              loadLigand(fileInput);
+            }
+          });
+        });
+      });
+
+      function updateFileName(type) {
+        const fileInput = document.getElementById(`${type}-file`);
+        const dropTitle = document.querySelector(
+          `#${type}-drop-container .drop-title`
+        );
+        if (fileInput.files.length > 0) {
+          dropTitle.textContent = fileInput.files[0].name;
+        } else {
+          dropTitle.textContent = `Drop or Choose ${
+            type.charAt(0).toUpperCase() + type.slice(1)
+          } File`;
+        }
+      }
+
+      var stage = new NGL.Stage("viewport1", {
+        backgroundColor: "white",
+        cameraType: "orthographic",
+      });
+      var stage_ligand = new NGL.Stage("view3d_lig", {
+        backgroundColor: "white",
+        cameraType: "orthographic",
+      });
+      window.addEventListener(
+        "resize",
+        function (event) {
+          stage.handleResize();
+          stage_ligand.handleResize();
+        },
+        false
+      );
+
+      function loadProtein(input) {
+        // alert("load protein");
+        if (input.files && input.files[0]) {
+          //  showProteinViewDiv();
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            stage.setParameters({ backgroundColor: "white" });
+            stage
+              .loadFile(new Blob([e.target.result], { type: "text/plain" }), {
+                ext: "pdb",
+                defaultRepresentation: true,
+              })
+              .then(function (component) {
+                proteinComponent = component;
+                component.addRepresentation("cartoon");
+                stage.autoView();
+                //updateBox();
+              });
+          };
+          reader.readAsText(input.files[0]);
+          //SHOWING DEFAULT GRID BOX
+          color = hexToRgb(document.getElementById("color").value);
+          color_list = [color.r / 255, color.g / 255, color.b / 255];
+          var pos = [x_center, y_center, z_center];
+          var size = [x_size, y_size, z_size];
+          shape = new NGL.Shape("shape");
+          shape = new NGL.Shape("shape", { lineWidth: 10, aspectRatio: 10 });
+          shape.addBox(
+            pos, // position
+            color_list, // color
+            size[0], // size
+            [0, size[1], 0], // height
+            [0, 0, size[2]]
+          ); // depth
+          shapeComp = stage.addComponentFromObject(shape);
+          repr = shapeComp.addRepresentation("buffer", { opacity: 0.5 });
+          // shapeComp.autoView();
+          stage.viewer.render();
+          // alert("stage loaded")
+        }
+      }
+      function hexToRgb(hex) {
+        // Convert Hex color to rgb fomat
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result
+          ? {
+              r: parseInt(result[1], 16),
+              g: parseInt(result[2], 16),
+              b: parseInt(result[3], 16),
+            }
+          : null;
+      }
+
+      function loadLigand(input) {
+        if (input.files && input.files[0]) {
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            stage_ligand.setParameters({ backgroundColor: "white" });
+            stage_ligand.removeAllComponents();
+            stage_ligand
+              .loadFile(new Blob([e.target.result], { type: "text/plain" }), {
+                ext: input.files[0].name.split(".").pop().toLowerCase(),
+                defaultRepresentation: true,
+              })
+              .then(function (component) {
+                component.addRepresentation("ball+stick");
+                stage_ligand.autoView();
+              });
+          };
+          reader.readAsText(input.files[0]);
+        }
+      }
+    
+      function checkFilesUploaded(jobName) {
+        const token = localStorage.getItem('jwtToken');
+        return fetch(`/api/checkUpload?jobName=${jobName}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+              throw new Error('Network response was not ok');
+          }
+          return response.text();
+        });
+      }
+      async function startDocking() {
+          const jobName = localStorage.getItem('jobName');
+          const token = localStorage.getItem('jwtToken');
+          localStorage.setItem('jobName','');
+          console.log('reset jobName'+localStorage.getItem('jobName'));
+          if (!jobName) {
+              alert("No job name found. Please create a new job before starting docking.");
+              return;
+            }
+            const job = await getJobDetails(jobName);
+            checkFilesUploaded(jobName)
+            .then(response=>{
+              if (response !== "Success:Files Uploaded") {
+                alert(response);
+                throw new Error( response);
+              }
+             // alert(response);
+             // establishSseConnection();
+             //add job in table
+             
+           //  console.log(job);
+             addJobToTable(job);
+             alert("Docking process initiated. Please wait while the operation completes.");
+             
+             const sseConnection = establishSseConnection(jobName);
+
+            // console.log("connection.....");
+              var formData = new FormData();
+              formData.append('jobName', jobName);
+
+
+              fetch('/api/serverDock', {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${token}`
+                },
+                body: formData,
+              })
+              .then(response => response.text())
+                .then(text => {
+                     // console.log(text);
+                      //establishSseConnection(); // Establish SSE connection after initiating docking
+                  })
+                  .catch(error => console.error('Error initiating docking:', error));          
+            });
+}
+
+
+function establishSseConnection(jobName ){
+    const token = localStorage.getItem('jwtToken');
+    const email = localStorage.getItem('email');
+   // console.log('Establishing SSE connection...',email);
+    
+    // const eventSource = new EventSource('/stream-updates', {
+    //     headers: {
+    //         'Authorization': `Bearer ${token}`
+    //     },
+    //     withCredentials: true
+    // });
+
+    const eventSource = new EventSource(`/stream-updates?jobName=${jobName}`);
+
+    eventSource.onopen = function(event) {
+     //   console.log('SSE connection opened');
+    };
+
+    eventSource.onmessage = function(event) {
+      //  console.log('Received SSE message:', event.data);
+        try {
+            // Check if the message is a valid JSON string
+            if (event.data.startsWith('{') && event.data.endsWith('}')) {
+              
+                const update = JSON.parse(event.data);
+                const progressBar = document.getElementById(`progress-${jobName}`);
+                
+                if (progressBar) {
+                 // console.log("get JSON message"+ update.status);
+                    const status = update.status; // Assuming status is a number between 1 and 10
+                    const progressPercentage = (status / 10) * 100; // Convert status to percentage
+                   // console.log("get JSON message"+progressPercentage);
+                    progressBar.style.width = `${progressPercentage}%`;
+                    progressBar.textContent = ` ${status} %`; // Update the text inside the progress bar
+                    if(status==10){
+                      progressBar.textContent = `completed`;
+                    }
+                    // Optionally, you could change the color based on progress
+                    if (progressPercentage === 100) {
+                        progressBar.classList.remove('progress-bar-striped', 'progress-bar-animated');
+                        progressBar.classList.add('bg-success'); // Make it green when complete
+                    }
+                }
+
+                if (event.data.includes("Task completed. Closing connection.")) {
+                  //  console.log('Job completed, closing SSE connection');
+                    eventSource.close();
+                }
+            } else {
+              //  console.log('Non-JSON message received:', event.data);
+            }
+        } catch (error) {
+            console.error('Error parsing SSE message:', error);
+        }
+
+
+        if (event.data.includes("Task completed. Closing connection.")) {
+          //  console.log('Job completed, closing SSE connection');
+            eventSource.close();
+        }
+        // Handle the update here
+    };
+
+    eventSource.onerror = function(error) {
+        console.error('SSE connection error:', error);
+        eventSource.close();
+        // Implement reconnection logic here if needed
+    };
+
+    return eventSource;
+}
+
+function getJobDetails(jobName) {
+        const token = localStorage.getItem('jwtToken');
+
+        if (!token) {
+          return Promise.reject(new Error("No authentication token found"));
+        }
+
+        return fetch(`/api/getJobByName?jobName=${jobName}`, {
+          method: 'GET',
+          headers: {
+              'Authorization': `Bearer ${token}`
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+              throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+          .then(data => {
+          //  console.log("Job details:", data);
+            return data;
+          });
+      }
+function addJobToTable(job) {
+   // console.log("Adding job in table "+job);
+    const table = document.getElementById('jobTable');
+    const tbody = table.querySelector('tbody');
+    
+    const newRow = tbody.insertRow();
+    
+    // Submit column
+    const submitCell = newRow.insertCell();
+    const timestamp = parseInt(job.jobName, 10);
+    const date = new Date(timestamp);
+   // const formattedDateTime = date.toLocaleString();
+   const formattedDateTime = date.toLocaleString('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+}).replace(/\//g, '-');
+
+
+    //submitCell.textContent = formattedDateTime;
+    submitCell.textContent=formatDate(job.jobName);
+
+    // Protein column
+    const proteinCell = newRow.insertCell();
+    const cleanedProteinFile = job.proteinFile.replace(`${job.jobName}_`, '').trim();
+    proteinCell.textContent =cleanedProteinFile;
+
+    // Ligand column
+    const ligandCell = newRow.insertCell();
+    ligandCell.textContent = job.ligandFiles.replace(`${job.jobName}_`, '').trim();
+
+    // Job Type column
+    const jobTypeCell = newRow.insertCell();
+    jobTypeCell.textContent = job.jobType || 'Docking'; // Add job type if available, otherwise 'N/A'
+
+
+    // Status column with progress bar
+    const statusCell = newRow.insertCell();
+    const progressBarContainer = document.createElement('div');
+    progressBarContainer.className = 'progress';
+
+    const progressBar = document.createElement('div');
+    progressBar.id = `progress-${job.jobName}`;
+    progressBar.className = 'progress-bar progress-bar-striped progress-bar-animated';
+    progressBar.role = 'progressbar';
+    progressBar.ariaValuenow = 0;
+    progressBar.ariaValuemin = 0;
+    progressBar.ariaValuemax = 100;
+    progressBar.style.width = '0%'; // Initial width
+    progressBar.textContent = 'Pending'; // Initial status text
+
+    progressBarContainer.appendChild(progressBar);
+    statusCell.appendChild(progressBarContainer);
+
+    // Actions column
+    const actionsCell = newRow.insertCell();
+     // View button
+     const viewButton = document.createElement('button');
+    viewButton.type = 'button';
+    viewButton.className = 'btn btn-outline-primary';
+    viewButton.textContent = 'View';
+    viewButton.onclick = function() { 
+    const url = `dockoutput.html?jobName=${encodeURIComponent(job.jobName)}`;
+    window.location.href = url;
+};
+    actionsCell.appendChild(viewButton);
+
+    // Add a space between buttons
+    actionsCell.appendChild(document.createTextNode(' '));
+
+    // Email button
+    const emailButton = document.createElement('button');
+    emailButton.type = 'button';
+    emailButton.className = 'btn btn-outline-success';
+    emailButton.textContent = 'Email';
+    emailButton.onclick = function() { emailJobDetails(job.id); };
+    actionsCell.appendChild(emailButton);
+
+    // You can add more action buttons here if needed
+} 
+function getStatusClass(status) {
+    switch(status.toUpperCase()) {
+        case 'PENDING': return 'status-pending';
+        case 'RUNNING': return 'status-running';
+        case 'COMPLETE': return 'status-complete';
+        case 'ERROR': return 'status-failed';
+        default: return '';
+    }
+}
+function getJobsAndAddToTable() {
+  showLoading();
+    const token = localStorage.getItem('jwtToken');
+
+    fetch('/api/getJobs', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json(); // Parse the JSON from the response
+    })
+    .then(jobs => {
+      //  console.log('Jobs:', jobs);
+        const table = document.getElementById('jobTable');
+        const tbody = table.querySelector('tbody');
+
+        jobs.forEach(job => {
+            const newRow = tbody.insertRow();
+
+            // Submit column
+            const submitCell = newRow.insertCell();
+            submitCell.textContent = formatDate(job.jobName); // Assuming jobName contains a timestamp
+
+            // Protein column
+            const proteinCell = newRow.insertCell();
+            //proteinCell.textContent = job.proteinFile.replace(job.jobName + "_", ""); // Remove jobName from proteinFile
+            proteinCell.textContent = job.proteinFile 
+                ? job.proteinFile.replace(job.jobName + "_", "") 
+                : "No file";
+
+            // Ligand column
+            const ligandCell = newRow.insertCell();
+            //ligandCell.textContent = job.ligandFiles.replace(job.jobName + "_", ""); // Remove jobName from ligandFiles
+            ligandCell.textContent = job.ligandFiles 
+                ? job.ligandFiles.replace(job.jobName + "_", "") 
+                : "No file";
+
+            // Job Type column
+            const jobTypeCell = newRow.insertCell();
+            jobTypeCell.textContent = job.jobType || 'Docking'; // Add job type if available, otherwise 'Docking'
+
+            // Status column with progress bar
+            const statusCell = newRow.insertCell();
+            statusCell.textContent = job.status;
+
+            // Actions column
+            const actionsCell = newRow.insertCell();
+            const viewButton = document.createElement('button');
+            viewButton.type = 'button';
+            viewButton.className = 'btn btn-outline-primary';
+            viewButton.textContent = 'View';
+            viewButton.onclick = function() { 
+    const url = `dockoutput.html?jobName=${encodeURIComponent(job.jobName)}`;
+    window.location.href = url;
+};
+            actionsCell.appendChild(viewButton);
+
+            actionsCell.appendChild(document.createTextNode(' ')); // Space between buttons
+
+            const emailButton = document.createElement('button');
+            emailButton.type = 'button';
+            emailButton.className = 'btn btn-outline-success';
+            emailButton.textContent = 'Email';
+            emailButton.onclick = function() { emailJobDetails(job.id); };
+            actionsCell.appendChild(emailButton);
+        });
+        hideLoading();
+      })
+    .catch(error => {
+      hideLoading();
+        console.error('Error fetching jobs:', error);
+    });
+}
+
+function formatDate(timestamp) {
+    const date = new Date(parseInt(timestamp));
+    return date.toLocaleString('en-GB', { 
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit' 
+    });
+}
+
+async function isJwtTokenValid() {
+    // Retrieve the JWT token from localStorage
+    const token = localStorage.getItem('jwtToken');
+
+    if (!token) {
+        console.error('No token found in localStorage');
+        return false;
+    }
+
+    // API endpoint URL
+    const apiUrl = '/api/validateUser';
+
+    // Set up the request options
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    };
+
+    try {
+        const response = await fetch(apiUrl, requestOptions);
+        
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const result = await response.text();
+        console.log('Token validation result:', result);
+
+        return result === 'Token is valid';
+    } catch (error) {
+        console.error('Error validating token:', error);
+        localStorage.setItem('jwtToken','');
+        return false;
+    }
+}
+
+
+</script>
+  </body>
+</html>

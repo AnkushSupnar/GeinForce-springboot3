@@ -1,0 +1,70 @@
+<style>
+  .navbar-nav .nav-link {
+      color: purple !important;
+  }
+  
+  .shadow{
+    background-color: #1E2A78; /* Dark blue color */
+    color: white;
+    width: 150px;
+    box-shadow: var(--bs-box-shadow) !important;
+  }
+  .link.active {
+    font-weight: 700 !important;
+}
+</style>
+<script>
+  
+  function navigatePage() {
+   var token = localStorage.getItem('jwtToken');
+   console.log(token);
+   
+   if (token !== null && token !== '') {
+       window.location.href = 'geindock.html';
+   } else {
+       window.location.href = 'login.html';
+   }
+
+}
+
+</script>
+<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top navbar-dark" >
+    <a href="index.html" class="navbar-brand">
+        <img class="img-fluid" width="267" height="97" src="assets/img/Geinforce%20Logo-H.png" alt="Geinforce Logo" style="padding: 2px;">
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+            <li class="nav-item"><a class="nav-link active mr-4 font-weight-bold" href="index.html">Home</a></li>
+        </li>
+        <li class="nav-item dropdown mr-4 font-weight-bold">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Products
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="#" onclick="navigatePage()">GeinDock Suite</a>
+            <!--<a class="dropdown-item" href="#">Another action</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">Something else here</a>-->
+          </div>
+        </li>
+        <li class="nav-item mr-4 font-weight-bold">
+          <a class="nav-link active" href="services.html">Services</a>
+        </li>
+        <li class="nav-item mr-4 font-weight-bold">
+          <a class="nav-link" href="pricing.html">Pricing</a>
+        </li>
+        <li class="nav-item mr-4 font-weight-bold">
+          <a class="nav-link" href="contacts.html">Contacts</a>
+        </li>
+      </ul>
+      <form class="form-inline my-2 my-lg-0" id="login-button">
+        <a class="btn btn-primary shadow ml-auto mr-2" role="button" href="login.html">Login</a>
+    </form>
+    </div>
+  </nav>
+
