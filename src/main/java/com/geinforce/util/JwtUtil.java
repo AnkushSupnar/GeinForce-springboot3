@@ -64,7 +64,7 @@ public class JwtUtil {
     }
 
     private String createToken(String subject) {
-    	expiration=60L;
+    	//expiration=60L;
         return Jwts.builder()
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))

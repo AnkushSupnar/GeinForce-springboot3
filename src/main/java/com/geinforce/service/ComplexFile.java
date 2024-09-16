@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,6 +26,7 @@ import org.biojava.nbio.structure.io.LocalPDBDirectory.FetchBehavior;
 import org.biojava.nbio.structure.io.PDBFileReader;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -34,6 +36,9 @@ public class ComplexFile {
 
     @Autowired
     FileService fileService;
+    
+    @Value("${tool.path.protein-ligand-complex}")
+    String complexScript;
 
     public void writeStringToFile(String content, String filePath) throws IOException {
         Files.write(Paths.get(filePath), content.getBytes());
@@ -160,88 +165,52 @@ public class ComplexFile {
         }
     }
 
+    public String combinePDBFiles(String proteinPath, String ligandPath, String outputPath) throws IOException, InterruptedException {
+        // Construct the command to run the Python script
+        String pythonScript = complexScript;
+        System.out.println("Got Script to run complex pdb: " + pythonScript);
+        System.out.println("Got proteinPath to run complex pdb: " + proteinPath);
+        System.out.println("Got ligandPath to run complex pdb: " + ligandPath);
+        System.out.println("Got outputPath to run complex pdb: " + outputPath);
 
-    public  String generateComplex(String proteinPath, String ligandPath, String outputPath) throws IOException {
-        List<String> proteinLines = readPDBFile(proteinPath);
-        List<String> ligandLines = readPDBFile(ligandPath);
-        List<String> conectRecords = extractConectRecords(ligandPath);
-        
-        List<String> complexLines = new ArrayList<>(proteinLines);
-        complexLines.add("TER");
-        complexLines.addAll(ligandLines);
-        complexLines.addAll(conectRecords);
-        
-        // Add MASTER and END records
-        complexLines.add(generateMasterRecord(complexLines));
-        complexLines.add("END");
-        
-        writePDBFile(outputPath, complexLines);
+        // Replace backslashes with forward slashes
+        proteinPath = proteinPath.replace("\\", "/");
+        ligandPath = ligandPath.replace("\\", "/");
+        outputPath = outputPath.replace("\\", "/");
+
+        // Construct the command array
+        String[] command = {"python", pythonScript, proteinPath, ligandPath, "-o", outputPath};
+
+        ProcessBuilder processBuilder = new ProcessBuilder(command);
+
+        // Redirect error stream to output stream
+        processBuilder.redirectErrorStream(true);
+
+        // Start the process
+        Process process = processBuilder.start();
+
+        // Read the output from the Python script
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String line;
+        StringBuilder output = new StringBuilder();
+        while ((line = reader.readLine()) != null) {
+            System.out.println(line);
+            output.append(line).append("\n");
+        }
+
+        // Wait for the process to complete
+        int exitCode = process.waitFor();
+
+        if (exitCode != 0) {
+            throw new RuntimeException("Python script execution failed with exit code: " + exitCode + "\nOutput: " + output.toString());
+        }
+
+        // Verify that the output file was created
+        Path outputFilePath = Paths.get(outputPath);
+        if (!Files.exists(outputFilePath)) {
+            throw new IOException("Output file was not created: " + outputPath);
+        }
+
         return outputPath;
     }
-    private  List<String> readPDBFile(String filePath) throws IOException {
-        List<String> lines = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith("ATOM") || line.startsWith("HETATM")) {
-                    lines.add(line);
-                }
-            }
-        }
-        return lines;
-    }
-    private  List<String> extractConectRecords(String filePath) throws IOException {
-        List<String> conectRecords = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith("CONECT")) {
-                    conectRecords.add(line);
-                }
-            }
-        }
-        return conectRecords;
-    }
-    private  String generateMasterRecord(List<String> lines) {
-        int numRemark = 0;
-        int numHet = 0;
-        int numHelix = 0;
-        int numSheet = 0;
-        int numTurn = 0;
-        int numSite = 0;
-        int numXform = 0;
-        int numCoord = 0;
-        int numTer = 0;
-        int numConect = 0;
-        int numSeq = 0;
-
-        for (String line : lines) {
-            if (line.startsWith("REMARK")) numRemark++;
-            else if (line.startsWith("HET")) numHet++;
-            else if (line.startsWith("HELIX")) numHelix++;
-            else if (line.startsWith("SHEET")) numSheet++;
-            else if (line.startsWith("TURN")) numTurn++;
-            else if (line.startsWith("SITE")) numSite++;
-            else if (line.startsWith("ORIGX") || line.startsWith("SCALE") || line.startsWith("MTRIX")) numXform++;
-            else if (line.startsWith("ATOM") || line.startsWith("HETATM")) numCoord++;
-            else if (line.startsWith("TER")) numTer++;
-            else if (line.startsWith("CONECT")) numConect++;
-            else if (line.startsWith("SEQRES")) numSeq++;
-        }
-
-        return String.format("MASTER    %5d%5d%5d%5d%5d%5d%5d%5d%5d%5d%5d%5d",
-                numRemark, 0, numHet, numHelix, numSheet, numTurn, numSite, numXform,
-                numCoord, numTer, numConect, numSeq);
-    }
-    
-    private  void writePDBFile(String filePath, List<String> lines) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-            for (String line : lines) {
-                writer.write(line);
-                writer.newLine();
-            }
-        }
-    }
-
-
 }

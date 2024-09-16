@@ -94,8 +94,9 @@ public class DockService {
 		        } else {
 		            System.out.println("Folder already exists: " + path);
 		        }
+			 proteinComplexFolder = proteinComplexFolder+File.separator+fileName;
 			//return complexFile.combineProteinAndLigand(proteinFilePath, ligandFilePath, proteinComplexFolder);
-			return complexFile.generateComplex(proteinFilePath, ligandFilePath, proteinComplexFolder);
+			return complexFile.combinePDBFiles(proteinFilePath, ligandFilePath, proteinComplexFolder);
 		}catch(Exception e) {
 			System.out.println("Error in getProteinComplexPath --------------"+e.getMessage());
 			return "";
