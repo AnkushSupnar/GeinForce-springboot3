@@ -1,16 +1,22 @@
 package com.geinforce.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URLEncoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -188,28 +194,77 @@ public class RESTServerDockController {
             String email = authentication.getName();
         	
             if(fileType.equals("protein-complex")) {
-            	System.out.println("Got download complex file for protein====="+fileName);
+            	System.out.println("Got download complex file for Ligand====="+fileName);
             	
             	String filePathString = dockService.getProteinComplexPath(fileName,jobName,email);
             	Path filePath = Paths.get(filePathString).normalize();
             	Resource resource = new UrlResource(filePath.toUri());
             	 if (resource.exists()) {
+            		 System.out.println("Got resource file Name = "+resource.getFilename());
             		 System.out.println("Resource complex protein is exist");
                      String contentType = "application/octet-stream"; // Default content type
+                     File file = resource.getFile();
+                     String actualFileName = file.getName();
+                     System.out.println("Actual file name from File object = " + actualFileName);
+                     String encodedFileName = URLEncoder.encode(actualFileName, StandardCharsets.UTF_8.toString())
+                             .replace("+", "%20");
+                     System.out.println("encodedFileName======"+encodedFileName);
+                   //  String contentDisposition = String.format("attachment; filename=\"%s\"; filename*=UTF-8''%s",
+                     //        actualFileName, encodedFileName);
+                     ContentDisposition contentDisposition = ContentDisposition.builder("attachment")
+                    		    .filename(actualFileName)
+                    		    .build();
+                     System.out.println("Content-Disposition = " + contentDisposition);
+//                     return ResponseEntity.ok()
+//                             .contentType(MediaType.parseMediaType(contentType))
+//                             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+//                             .body(resource);
+//                     return ResponseEntity.ok()
+//                             .contentType(MediaType.parseMediaType(contentType))
+//                             .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+//                             .body(resource);
                      return ResponseEntity.ok()
-                             .contentType(MediaType.parseMediaType(contentType))
-                             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                             .body(resource);
-
+                    		    .contentType(MediaType.parseMediaType(contentType))
+                    		    .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
+                    		    .body(resource);
             		 
             	 }
             	 else {
+            		 System.out.println("Resource does not exist: " + filePathString);
                      return ResponseEntity.notFound().build();
                  }
             	
             }
+            if(fileType.equals("output")) {
+            	String filePathString = fileService.getFilePathFromName(jobName, email, fileType, fileName);
+            	System.out.println("File Path String "+filePathString);
+            	System.out.println("Ligand file Name ===== "+fileName);
+            	String jsonFilePath = fileService.getFilePathFromName(jobName, email, "vinaJSON", fileName);
+            	String score = fileService.getScore(jsonFilePath,fileName);
+            	System.out.println("Got score ======"+score);
+            	System.out.println("Vina JSON file path = "+jsonFilePath);
+            	 Path filePath = Paths.get(filePathString).normalize();
+                 Resource resource = new UrlResource(filePath.toUri());
+
+                 if (resource.exists()) {
+                 	System.out.println("Resource is exist");
+                     String contentType = "application/octet-stream"; // Default content type
+                     
+                     return ResponseEntity.ok()
+                             .contentType(MediaType.parseMediaType(contentType))
+                             .header(HttpHeaders.CONTENT_DISPOSITION,
+                            		 "attachment; filename=\"" + resource.getFilename().replace(".pdb", "_("+score+").pdb") + "\"")
+                             .body(resource);
+                 } else {
+                     return ResponseEntity.notFound().build();
+                 }
+
+            	
+            }
+            else {
             // Use FileService to construct the file path
             String filePathString = fileService.getFilePathFromName(jobName, email, fileType, fileName);
+            
             System.out.println("File Path String "+filePathString);
             Path filePath = Paths.get(filePathString).normalize();
             Resource resource = new UrlResource(filePath.toUri());
@@ -217,7 +272,7 @@ public class RESTServerDockController {
             if (resource.exists()) {
             	System.out.println("Resource is exist");
                 String contentType = "application/octet-stream"; // Default content type
-
+                
                 return ResponseEntity.ok()
                         .contentType(MediaType.parseMediaType(contentType))
                         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
@@ -225,7 +280,8 @@ public class RESTServerDockController {
             } else {
                 return ResponseEntity.notFound().build();
             }
-        } catch (MalformedURLException ex) {
+        }
+        } catch (IOException ex) {
         	System.out.println("Error in downloading "+ex.getMessage());
             return ResponseEntity.badRequest().body(null);
         }

@@ -9,6 +9,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.geinforce.model.Job;
 
 import java.io.*;
@@ -21,7 +22,10 @@ import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import org.springframework.core.io.Resource;
@@ -830,4 +834,37 @@ public class FileService {
             System.err.println("Failed to list resource contents: " + e.getMessage());
         }
     }
+
+	public String getScore(String jsonFilePath,String ligandFileName) {
+		try {
+			int mode = extractNumberUsingRegex(ligandFileName);
+			 ObjectMapper objectMapper = new ObjectMapper();
+			 List<Map<String, Object>> jsonList = objectMapper.readValue(new File(jsonFilePath),
+	                    objectMapper.getTypeFactory().constructCollectionType(List.class, Map.class));
+
+			 for (Map<String, Object> item : jsonList) {
+	                if (item.get("mode").equals(mode)) {
+	                    //double affinity = (double) item.get("affinity");
+	                    return ""+ item.get("affinity");
+	                    //return String.format("%.1f", affinity);
+	                }
+	            }
+
+	            System.out.println("Mode " + mode + " not found in the JSON file.");
+	            return "";
+		} catch (Exception e) {
+			System.out.println("Error in getting docking score "+e.getMessage());
+			return "";
+		}
+	}
+	 public int extractNumberUsingRegex(String fileName) {
+	        Pattern pattern = Pattern.compile("_ligand_(\\d+)\\.pdb$");
+	        Matcher matcher = pattern.matcher(fileName);
+	        if (matcher.find()) {
+	        	int mode = Integer.parseInt(matcher.group(1));
+	            //return matcher.group(1);
+	        	return mode;
+	        }
+	        return 0;
+	    }
     }

@@ -128,6 +128,7 @@
 }
     </style>
     <script>
+        
         $(function(){
             $("#navbar-placeholder").load("nav.html");
         });
@@ -258,21 +259,19 @@
         var stage_dock = new NGL.Stage("viewport", { backgroundColor: "white", cameraType: "orthographic" });
         var coordinates;
         let loadedComponentsMap = {};
-        window.onload = function() {
-            const token = localStorage.getItem('jwtToken');
-  console.log('token',token)
-  if (!token) {
-        // Token not found, redirect to login page
-        console.log('No JWT token found. Redirecting to login page...');
-        window.location.href = 'login.html';
-    }
-
-
-
+        window.onload =async function() {
+            const token = localStorage.getItem('jwtToken');            
+            const isValid = await isJwtTokenValid();
+           // console.log('token',token)
+        if (!token|| !isValid) {
+            // Token not found, redirect to login page
+            console.log('No JWT token found. Redirecting to login page...');
+            window.location.href = 'login.html';
+        }
 
             const urlParams = new URLSearchParams(window.location.search);
             const jobName = urlParams.get('jobName');
-            console.log(jobName); 
+           // console.log(jobName); 
             getJobByName(jobName);
 
             window.addEventListener("resize", function (event) {       
@@ -305,7 +304,7 @@
                 return response.json();
             })
             .then(data => {
-                console.log("Job details:", data);
+              //  console.log("Job details:", data);
                 document.getElementById('proteinFileName').textContent = data.proteinFile;
                 document.getElementById('ligandFileName').textContent = data.ligandFiles;
                 
@@ -317,7 +316,7 @@
                 ligandFileLink.onclick = () => downloadFile(data.jobName, 'ligand', data.ligandFiles);
 
                 var coordinatesStr =  data.coordinates;
-                console.log(coordinatesStr);
+               // console.log(coordinatesStr);
                 const jsonObject = JSON.parse(coordinatesStr);
                 //coordinates  = `Center:{x: ${jsonObject.center.x}, y: ${jsonObject.center.y}, z: ${jsonObject.center.z}} Size:{${jsonObject.size.x}, ${jsonObject.size.y}, ${jsonObject.size.z}}`;
                 coordinates = `Center:{x: ${jsonObject.center.x.toFixed(2)}, y: ${jsonObject.center.y.toFixed(2)}, z: ${jsonObject.center.z.toFixed(2)}} Size:{x: ${jsonObject.size.x.toFixed(2)}, y: ${jsonObject.size.y.toFixed(2)}, z: ${jsonObject.size.z.toFixed(2)}}`;
@@ -343,10 +342,12 @@
 }
 
         function downloadFile(jobName, fileType, fileName) {
+            showLoading();
             const token = localStorage.getItem('jwtToken');
             
             if (!token) {
                 console.error("No authentication token found");
+                hideLoading();
                 return;
             }
 
@@ -360,6 +361,7 @@
             })
             .then(response => {
                 if (!response.ok) {
+                    hideLoading();
                     throw new Error('Network response was not ok');
                 }
                 return response.blob();
@@ -373,8 +375,10 @@
                 document.body.appendChild(a);
                 a.click();
                 window.URL.revokeObjectURL(url);
+                hideLoading();
             })
             .catch(error => console.error('Download error:', error));
+            hideLoading();
         }
     
         function loadNGL() {
@@ -452,85 +456,89 @@
                 tableBody.innerHTML = '';
 
                 data.forEach(item => {
-                    console.log(item);
-                const row = document.createElement('tr');
+                   // console.log(item);
+                    const row = document.createElement('tr');
 
-            const modeCell = document.createElement('td');
-            modeCell.textContent = item.mode;
-            row.appendChild(modeCell);
+                    const modeCell = document.createElement('td');
+                    modeCell.textContent = item.mode;
+                    row.appendChild(modeCell);
 
-            const vinaScore = document.createElement('td');
-            vinaScore.textContent = item.affinity;
-            row.appendChild(vinaScore);
+                    const vinaScore = document.createElement('td');
+                    vinaScore.textContent = item.affinity;
+                    row.appendChild(vinaScore);
 
-            const coordinateCol = document.createElement('td');
-            coordinateCol.textContent = coordinates;
-            row.appendChild(coordinateCol);
-            console.log(coordinates);
+                    const coordinateCol = document.createElement('td');
+                    coordinateCol.textContent = coordinates;
+                    row.appendChild(coordinateCol);
+                   // console.log(coordinates);
 
-            const linkContainer = document.createElement('div');
-            linkContainer.style.display = 'flex';
-            linkContainer.style.flexDirection = 'column';
-            linkContainer.style.alignItems = 'flex-start'; 
+                    const linkContainer = document.createElement('div');
+                    linkContainer.style.display = 'flex';
+                    linkContainer.style.flexDirection = 'column';
+                    linkContainer.style.alignItems = 'flex-start'; 
 
+                    const ligandFileCell = document.createElement('td');
+                   // console.log(item.ligand);
+                    const extractLigandFileName = path => 
+                    path.split('\\').pop().split('_').slice(-2).join('_');
+                    var fileName = extractLigandFileName(item.ligand);
 
-            const ligandFileCell = document.createElement('td');
-            console.log(item.ligand);
-            const extractLigandFileName = path => 
-                path.split('\\').pop().split('_').slice(-2).join('_');
-            var fileName = extractLigandFileName(item.ligand);
-            console.log(fileName);
-           // const fileName = item.ligand.split("\\").pop() || item.ligand.split("/").pop();
-            const ligNumber = fileName.split('_')[1].split('.')[0];
-            const fileLink = document.createElement('a');
-            fileLink.href = "javascript:void(0);"; // Prevent default link behavior
-            fileLink.textContent = "ligand_"+ligNumber+".pdb";
-            fileLink.textContent =fileName;
-           var LigfileName = jobName+'_'+fileName;
-            fileLink.onclick = (event) => {
-                event.preventDefault();
-                downloadFile(jobName, 'output', LigfileName);
-            };
-           // ligandFileCell.appendChild(fileLink);    
-            linkContainer.appendChild(fileLink);        
+                   // console.log("Extracted ligand Name"+fileName);
+                    // const fileName = item.ligand.split("\\").pop() || item.ligand.split("/").pop();
+                    const ligNumber = fileName.split('_')[1].split('.')[0];
+                    const fileLink = document.createElement('a');
+                    fileLink.href = "javascript:void(0);"; // Prevent default link behavior
+                    fileLink.textContent = "ligand_"+ligNumber+".pdb";
+                    fileLink.textContent =fileName;
+                    var LigfileName = jobName+'_'+fileName;
+                    fileLink.onclick = (event) => {
+                        event.preventDefault();
+                        downloadFile(jobName, 'output', LigfileName);
+                    };
+                    // ligandFileCell.appendChild(fileLink);    
+                    linkContainer.appendChild(fileLink);        
            
+                    const complexFileName = item.complex.split("\\").pop() || item.complex.split("/").pop();
+                    // const extractedNumber = complexFileName.split('_')[1].split('.')[0];
+                    const extractedNumber=fileName.split('_')[1].split('.')[0]; 
+                  //  console.log(fileName);
+                    const complexFileLink = document.createElement('a');
+                    complexFileLink.href = "javascript:void(0);";
+                    complexFileLink.textContent ="Protein-ligand_complex_"+ extractedNumber+".pdb";
+                    fileName = jobName+'_protein_'+fileName;
+           
+                    complexFileLink.onclick = (event) => {
+                      //  console.log("Sending ligand fileName "+item.ligand);
+                      showLoading();
+                        event.preventDefault();
+                       // alert("download complex");
+                        downloadFile(jobName, 'protein-complex', item.ligand);
+                        hideLoading();
+                    };
+                    //ligandFileCell.appendChild(complexFileLink);  
+                    linkContainer.appendChild(complexFileLink);  
+                    // row.appendChild(ligandFileCell);
+                    row.appendChild(linkContainer);
 
-            const complexFileName = item.complex.split("\\").pop() || item.complex.split("/").pop();
-           // const extractedNumber = complexFileName.split('_')[1].split('.')[0];
-           const extractedNumber=fileName.split('_')[1].split('.')[0]; 
-           console.log(fileName);
-            const complexFileLink = document.createElement('a');
-            complexFileLink.href = "javascript:void(0);";
-            complexFileLink.textContent ="Protein-ligand_complex_"+ extractedNumber+".pdb";
-            fileName = jobName+'_protein_'+fileName;
-            complexFileLink.onclick = (event) => {
-                event.preventDefault();
-                alert("download complex");
-                downloadFile(jobName, 'protein-complex', fileName);
-            };
-            //ligandFileCell.appendChild(complexFileLink);  
-            linkContainer.appendChild(complexFileLink);  
-           // row.appendChild(ligandFileCell);
-           row.appendChild(linkContainer);
+                    row.addEventListener('click', (event) => {
+                        if (event.target.tagName.toLowerCase() !== 'a') {
+                           // console.log("GOt ligand");
+                            if (row.classList.contains('selected')) {
+                                row.classList.remove('selected');
+                                removeComponentFromStage(stage_dock, item.mode);
+                            } else {
+                                row.classList.add('selected');
+                                downloadAndLoadOneLigand(stage_dock, jobName, 'output', fileName, item.mode);
+                            }
+                        }
+                    });
 
-            row.addEventListener('click', (event) => {
-                if (event.target.tagName.toLowerCase() !== 'a') {
-                    if (row.classList.contains('selected')) {
-                        row.classList.remove('selected');
-                        removeComponentFromStage(stage_dock, item.mode);
-                    } else {
-                        row.classList.add('selected');
-                        downloadAndLoadOneLigand(stage_dock, jobName, 'output', fileName, item.mode);
-                    }
-                }
-            });
-
-            tableBody.appendChild(row);
-        });
-    } catch (error) {
-        console.error('Error fetching data:', error);
-    }
-}
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
 async function downloadAndLoadOneLigand(stage, jobName, fileType, fileName, index) {
     try {
         const blob = await downloadFileAsBlob(jobName, fileType, fileName);
@@ -564,7 +572,37 @@ async function downloadFileAsBlob(jobName, fileType, fileName) {
 
     return response.blob();
 }
+async function isJwtTokenValid() {
+            const token = localStorage.getItem('jwtToken');
 
+            if (!token) {
+                console.error('No token found in localStorage');
+                return false;
+            }
+
+            const apiUrl = '/api/validateUser';
+            const requestOptions = {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            };
+
+            try {
+                const response = await fetch(apiUrl, requestOptions);
+                if (!response.ok) {
+                    //throw new Error('Network response was not ok');
+                    return false;
+                }
+                const result = await response.text();
+               // console.log('Token validation result:', result);
+                return result === 'Token is valid';
+            } catch (error) {
+                console.error('Error validating token:', error);
+                localStorage.removeItem('jwtToken');
+                return false;
+            }
+        }
 
     </script>
 </body>

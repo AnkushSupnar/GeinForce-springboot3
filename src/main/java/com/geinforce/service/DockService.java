@@ -68,15 +68,16 @@ public class DockService {
          */
     }
 
-	public String getProteinComplexPath(String fileName, String  jobName,String email) {
+	public String getProteinComplexPath(String ligandFilePath, String  jobName,String email) {
 		try {
 			Job job = jobService.getJobByName(jobName);
 			String proteinFilePath = fileService.getFilePath(jobName,email,"protein");
+			proteinFilePath = proteinFilePath.replace(".pdb","_clean.pdb");
 			System.out.println("Protein file path to make complex======"+proteinFilePath);
 			String ligandComplexFolderPath = fileService.getFilePath(jobName,email,"complex_lig");
 			System.out.println("Ligand_complex path=========="+ligandComplexFolderPath);
 			
-			String ligandFilePath = ligandComplexFolderPath+File.separator+(fileName.replace("protein_", ""));
+			//String ligandFilePath = ligandComplexFolderPath+File.separator+(fileName.replace("protein_", ""));
 			System.out.println("Got ligand file path ==========="+ligandFilePath);
 			
 			
@@ -94,9 +95,14 @@ public class DockService {
 		        } else {
 		            System.out.println("Folder already exists: " + path);
 		        }
+			 String fileName = job.getProteinFile().replace(".pdb", "");
+			 String ligandFileName = Paths.get(ligandFilePath).getFileName().toString().replace(jobName,"");
+			 fileName = fileName+ligandFileName;
 			 proteinComplexFolder = proteinComplexFolder+File.separator+fileName;
+			 System.out.println("Protein ligand complex file Name = "+proteinComplexFolder);
 			//return complexFile.combineProteinAndLigand(proteinFilePath, ligandFilePath, proteinComplexFolder);
 			return complexFile.combinePDBFiles(proteinFilePath, ligandFilePath, proteinComplexFolder);
+		//return "";
 		}catch(Exception e) {
 			System.out.println("Error in getProteinComplexPath --------------"+e.getMessage());
 			return "";
