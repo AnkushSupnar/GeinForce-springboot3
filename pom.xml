@@ -166,7 +166,7 @@
 </dependencies>
 
 	<build>
-	<finalName>ROOT</finalName>
+	<finalName>GeinForce</finalName>
 
 		<plugins>
 			<plugin>

@@ -447,8 +447,8 @@ window.onload = async function() {
 
         const uploadUrl =
           type === "protein"
-            ? "/api/serverDockUpload"
-            : "/api/serverDockUploadLigand";
+            ? "/GeinForce/api/serverDockUpload"
+            : "/GeinForce/api/serverDockUploadLigand";
 
         fetch(uploadUrl, {
           method: "POST",
@@ -640,7 +640,7 @@ window.onload = async function() {
     
       function checkFilesUploaded(jobName) {
         const token = localStorage.getItem('jwtToken');
-        return fetch(`/api/checkUpload?jobName=${jobName}`, {
+        return fetch(`/GeinForce/api/checkUpload?jobName=${jobName}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -684,7 +684,7 @@ window.onload = async function() {
               formData.append('jobName', jobName);
 
 
-              fetch('/api/serverDock', {
+              fetch('/GeinForce/api/serverDock', {
                 method: 'POST',
                 headers: {
                   'Authorization': `Bearer ${token}`
@@ -713,7 +713,7 @@ function establishSseConnection(jobName ){
     //     withCredentials: true
     // });
 
-    const eventSource = new EventSource(`/stream-updates?jobName=${jobName}`);
+    const eventSource = new EventSource(`/GeinForce/stream-updates?jobName=${jobName}`);
 
     eventSource.onopen = function(event) {
      //   console.log('SSE connection opened');
@@ -780,7 +780,7 @@ function getJobDetails(jobName) {
           return Promise.reject(new Error("No authentication token found"));
         }
 
-        return fetch(`/api/getJobByName?jobName=${jobName}`, {
+        return fetch(`/GeinForce/api/getJobByName?jobName=${jobName}`, {
           method: 'GET',
           headers: {
               'Authorization': `Bearer ${token}`
@@ -893,7 +893,7 @@ function getJobsAndAddToTable() {
   showLoading();
     const token = localStorage.getItem('jwtToken');
 
-    fetch('/api/getJobs', {
+    fetch('/GeinForce/api/getJobs', {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -987,7 +987,7 @@ async function isJwtTokenValid() {
     }
 
     // API endpoint URL
-    const apiUrl = '/api/validateUser';
+    const apiUrl = '/GeinForce/api/validateUser';
 
     // Set up the request options
     const requestOptions = {

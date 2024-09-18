@@ -291,7 +291,7 @@
                 return Promise.reject(new Error("No authentication token found"));
             }
 
-            return fetch(`/api/getJobByName?jobName=${jobName}`, {
+            return fetch(`/GeinForce/api/getJobByName?jobName=${jobName}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -351,7 +351,7 @@
                 return;
             }
 
-            const url = `/api/download?jobName=${encodeURIComponent(jobName)}&fileType=${encodeURIComponent(fileType)}&fileName=${encodeURIComponent(fileName)}`;
+            const url = `/GeinForce/api/download?jobName=${encodeURIComponent(jobName)}&fileType=${encodeURIComponent(fileType)}&fileName=${encodeURIComponent(fileName)}`;
 
             fetch(url, {
                 method: 'GET',
@@ -398,7 +398,7 @@
                 return Promise.reject(new Error("No authentication token found"));
             }
 
-            var url = `/api/getProteinFile?jobName=${encodeURIComponent(jobName)}`;
+            var url = `/GeinForce/api/getProteinFile?jobName=${encodeURIComponent(jobName)}`;
     
             return fetch(url, {
                 method: 'GET',
@@ -437,7 +437,7 @@
                 return;
             }
 
-            var url = `/api/getOutputTable?jobName=${encodeURIComponent(jobName)}`;
+            var url = `/GeinForce/api/getOutputTable?jobName=${encodeURIComponent(jobName)}`;
     
             try {
                 const response = await fetch(url, {
@@ -557,7 +557,7 @@ async function downloadFileAsBlob(jobName, fileType, fileName) {
         throw new Error("No authentication token found");
     }
 
-    const url = `/api/download?jobName=${encodeURIComponent(jobName)}&fileType=${encodeURIComponent(fileType)}&fileName=${encodeURIComponent(fileName)}`;
+    const url = `/GeinForce/api/download?jobName=${encodeURIComponent(jobName)}&fileType=${encodeURIComponent(fileType)}&fileName=${encodeURIComponent(fileName)}`;
 
     const response = await fetch(url, {
         method: 'GET',
@@ -580,7 +580,7 @@ async function isJwtTokenValid() {
                 return false;
             }
 
-            const apiUrl = '/api/validateUser';
+            const apiUrl = '/GeinForce/api/validateUser';
             const requestOptions = {
                 method: 'POST',
                 headers: {

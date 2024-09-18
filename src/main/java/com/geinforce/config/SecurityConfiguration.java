@@ -44,14 +44,14 @@ public class SecurityConfiguration {
             "/configuration/ui",
             "/configuration/security",
             "/swagger-ui/**",
-            "/webjars/**",
-            "/swagger-ui.html",
+            "/webjars/**",            
             "/api/register",
             "/api/login",
             "/api/verifyUser",
             "/api/signup",
             "/api/verifiedInstituteNames",
-            "/stream-updates"
+            "/stream-updates",
+            "/api/contacts"
             
     };
 
