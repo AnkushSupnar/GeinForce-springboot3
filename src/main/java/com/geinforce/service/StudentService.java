@@ -18,7 +18,7 @@ public class StudentService {
         if(student.getVerified()==null){
             student.setVerified(false);
         }
-        String otpResult =  sendEmail.sendEmail(student.getEmail(),student.getFirstName()+" "+student.getLastName());
+        String otpResult =  sendEmail.sendOTPEmail(student.getEmail(),student.getFirstName()+" "+student.getLastName());
         if(otpResult.equalsIgnoreCase("Failed")){
             return "fail:OTP Send Failed";
         }

@@ -21,7 +21,7 @@ public class UserService {
         if(user.getVerified()==null){
             user.setVerified(false);
         }
-        String otpResult =  sendEmail.sendEmail(user.getEmail(),user.getFirstName()+" "+user.getLastName());
+        String otpResult =  sendEmail.sendOTPEmail(user.getEmail(),user.getFirstName()+" "+user.getLastName());
         if(otpResult.equalsIgnoreCase("Failed")){
             return "Fail:OTP Send Failed";
         }

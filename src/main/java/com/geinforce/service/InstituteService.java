@@ -23,7 +23,7 @@ public class InstituteService {
         if(institute.getVerificationMethod()==null){
             institute.setVerificationMethod("email");
         }
-        String otpResult =  sendEmail.sendEmail(institute.getInstituteEmail(),institute.getInstituteName());
+        String otpResult =  sendEmail.sendOTPEmail(institute.getInstituteEmail(),institute.getInstituteName());
         if(otpResult.equalsIgnoreCase("Failed")){
             return "Fail:OTP Send Failed";
         }
