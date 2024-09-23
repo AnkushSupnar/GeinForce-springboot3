@@ -126,6 +126,63 @@
     overflow-x: auto;
     padding-bottom: 15px; /* Space for the scrollbar */
 }
+
+
+/*radio button of table*/
+.radio-style-checkbox {
+    display: none;
+}
+
+.radio-style-label {
+    position: relative;
+    padding-left: 28px;
+    cursor: pointer;
+    display: inline-block;
+    line-height: 20px;
+    font-size: 14px;
+    color: #00EA90;
+    margin-right: 15px;
+}
+
+.radio-style-label:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 15px;
+    height: 15px;
+    border: 2px solid #00EA90;
+    border-radius: 50%;
+    background: #fff;
+    transition: all 0.3s ease;
+}
+
+.radio-style-checkbox:checked + .radio-style-label:before {
+    background-color:#06920d;
+    background-color: #00EA90;;
+}
+
+.radio-style-checkbox:checked + .radio-style-label:after {
+    content: '';
+    width: 7.5px;
+    height: 7.5px;
+    background: #fff;
+
+    position: absolute;
+    top: 3px;
+    left: 4px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.radio-style-label:hover:before {
+    border-color: #00EA90;
+}
+
+
+
+
+
     </style>
     <script>
         
@@ -426,7 +483,7 @@
             component.addRepresentation(representationType, representationParams);
             component.autoView();
             //  console.log("Adding to map with index:", index);
-           // loadedComponentsMap[index] = component;
+            loadedComponentsMap[index] = component;
         });
 }
         async function downloadDockingTable(jobName) {
@@ -460,7 +517,26 @@
                     const row = document.createElement('tr');
 
                     const modeCell = document.createElement('td');
-                    modeCell.textContent = item.mode;
+                    
+                    const radioButton = document.createElement('input');
+                    radioButton.type = 'checkbox';
+                    radioButton.name = 'rowSelector';
+                    radioButton.value = item.mode;
+                    radioButton.id = `radio-${item.mode}`;
+                    radioButton.className = 'radio-style-checkbox';
+
+                    const label = document.createElement('label');
+                    label.htmlFor = `checkbox-${item.mode}`;
+                    label.className = 'radio-style-label';
+                    
+                    //modeCell.appendChild(radioButton);
+                    //modeCell.appendChild(document.createTextNode(` ${item.mode}`));
+                    modeCell.appendChild(radioButton);
+                    modeCell.appendChild(label);
+                    modeCell.appendChild(document.createTextNode(` ${item.mode}`));
+
+                    
+                    //modeCell.textContent = item.mode;
                     row.appendChild(modeCell);
 
                     const vinaScore = document.createElement('td');
@@ -505,6 +581,8 @@
                     const complexFileLink = document.createElement('a');
                     complexFileLink.href = "javascript:void(0);";
                     complexFileLink.textContent ="Protein-ligand_complex_"+ extractedNumber+".pdb";
+                    console.log('first file Name ',fileName);
+                    var ligandFileName =jobName+'_' +fileName;
                     fileName = jobName+'_protein_'+fileName;
            
                     complexFileLink.onclick = (event) => {
@@ -523,15 +601,22 @@
                     row.addEventListener('click', (event) => {
                         if (event.target.tagName.toLowerCase() !== 'a') {
                            // console.log("GOt ligand");
+                           //radioButton.checked = !radioButton.checked;
                             if (row.classList.contains('selected')) {
                                 row.classList.remove('selected');
+                                radioButton.checked=false;
                                 removeComponentFromStage(stage_dock, item.mode);
                             } else {
+                                radioButton.checked=true;
                                 row.classList.add('selected');
-                                downloadAndLoadOneLigand(stage_dock, jobName, 'output', fileName, item.mode);
+                                console.log('file name of ligand ',ligandFileName);
+                                downloadAndLoadOneLigand(stage_dock, jobName, 'output', ligandFileName, item.mode);
                             }
                         }
                     });
+                    radioButton.addEventListener('change', () => {
+                      
+            });
 
                     tableBody.appendChild(row);
                 });
@@ -539,6 +624,33 @@
                 console.error('Error fetching data:', error);
             }
         }
+       
+
+        
+        
+
+
+
+
+       
+       
+        function removeComponentFromStage(stage, index) {
+
+const component = loadedComponentsMap[index];
+if (component) {
+// console.log("Current stage components before removal:", stage.compList);
+    stage.removeComponent(component);
+ //   console.log("Removing from map with index:", index);
+    delete loadedComponentsMap[index];
+  //  console.log("Current stage components after removal:", stage.compList);
+    // component.removeAllRepresentations();
+    // stage.autoView();
+    // stage.requestRender();
+} else {
+    console.error(`Component ${index} not found.`);
+}
+}
+
 async function downloadAndLoadOneLigand(stage, jobName, fileType, fileName, index) {
     try {
         const blob = await downloadFileAsBlob(jobName, fileType, fileName);
