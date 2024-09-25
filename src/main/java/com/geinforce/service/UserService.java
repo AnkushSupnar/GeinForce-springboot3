@@ -21,7 +21,7 @@ public class UserService {
         if(user.getVerified()==null){
             user.setVerified(false);
         }
-        String otpResult =  sendEmail.sendOTPEmail(user.getEmail(),user.getFirstName()+" "+user.getLastName());
+        String otpResult =  sendEmail.sendOTP(user.getEmail(),user.getFirstName()+" "+user.getLastName());
         if(otpResult.equalsIgnoreCase("Failed")){
             return "Fail:OTP Send Failed";
         }
@@ -49,6 +49,7 @@ public class UserService {
         System.out.println("in service email="+email);
         User user = getNoneRegisterUserByEmail(email,otp);
         if(user !=null){
+        	
             user.setVerified(true);
             return updateUser(user);
         }

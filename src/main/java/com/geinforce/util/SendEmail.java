@@ -32,7 +32,7 @@ public class SendEmail {
 	@Value("${support.team.email}")
 	private String supportTeamEmail;
 
-	public String sendOTPEmail(String receiver, String name) {
+	public String sendOTPEmail1(String receiver, String name) {
 		String otp = passwordUtility.generateOTP();
 		Properties props = new Properties();
 		props.put("mail.smtp.auth", "true");
@@ -337,7 +337,7 @@ public class SendEmail {
 		}
 	}
 
-	public String sendOTPVerificationEmail(String recipientName, String recipientEmail) {
+	public String sendOTP( String recipientEmail,String recipientName) {
 		try {
 			String otp = passwordUtility.generateOTP();
 			Message message = getMessage();
