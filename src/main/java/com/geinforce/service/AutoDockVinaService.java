@@ -186,7 +186,7 @@ public class AutoDockVinaService {
 
                 // System.out.println("result of conversion = " + pdbqtToPdb);
 
-                jobService.updateJobStatus(jobName, email, JobStatus.COMPLETE);
+                jobService.updateJobStatus(jobName, email, JobStatus.COMPLETED);
                 sseController.sendUpdateToClient(
                         "{\"jobName\":\"" + jobName + "\",\"message\":\"Convert output file \",\"status\":9}",jobName);
                 

@@ -1,3 +1,8 @@
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -251,6 +256,69 @@
           </div>
         </div>
 
+        <!-- New row for grid box controls -->
+         <!--
+<div class="row mt-3">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Grid Box Controls</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-2">
+            <label for="grid-center-x">Center X:</label>
+            <input type="number" id="grid-center-x" class="form-control" value="0">
+          </div>
+          <div class="col-md-2">
+            <label for="grid-center-y">Center Y:</label>
+            <input type="number" id="grid-center-y" class="form-control" value="0">
+          </div>
+          <div class="col-md-2">
+            <label for="grid-center-z">Center Z:</label>
+            <input type="number" id="grid-center-z" class="form-control" value="0">
+          </div>
+          <div class="col-md-2">
+            <label for="grid-size-x">Size X:</label>
+            <input type="number" id="grid-size-x" class="form-control" value="10">
+          </div>
+          <div class="col-md-2">
+            <label for="grid-size-y">Size Y:</label>
+            <input type="number" id="grid-size-y" class="form-control" value="10">
+          </div>
+          <div class="col-md-2">
+            <label for="grid-size-z">Size Z:</label>
+            <input type="number" id="grid-size-z" class="form-control" value="10">
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-md-4">
+            <label for="grid-color">Grid Color:</label>
+            <input type="color" id="grid-color" class="form-control" value="#ff0000">
+          </div>
+          <div class="col-md-4">
+            <button class="btn btn-primary mt-4" onclick="updateGridBox()">Update Grid Box</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+-->
+
+
+
+
+
+
+
+
+
+
+
+        <!--Ligand starts from here-->
+
         <div class="row mt-0">
           <div class="col-md-4">
             <div class="card">
@@ -418,12 +486,19 @@
           </div>
       </div>
   </footer>
-
+<!--
     <script src="assets/js/jquery-3.2.1.slim.min.js"></script>
     <script src="assets/js/popper.min.js" crossorigin="anonymous"></script>
     <script src="assets/js/bootstrap.min.js" crossorigin="anonymous"></script>
     <script src="assets/js/jquery-3.5.1.min.js"></script>
     <script src="assets/js/ngl.js"></script>
+-->
+<script src="assets/js/toast.js"></script>
+<script src="https://unpkg.com/ngl@2.0.0-dev.37/dist/ngl.js"></script>
+<script src="assets/js/jquery-3.5.1.min.js" defer></script>
+<script src="assets/js/popper.min.js" crossorigin="anonymous" defer></script>
+<script src="assets/js/bootstrap.min.js" crossorigin="anonymous" defer></script>
+<script src="assets/js/ngl.js"></script>
     <script>
     // Call this function when the window loads
 window.onload = async function() {
@@ -493,13 +568,14 @@ async function updateNavbar() {
       
 
         if (!token) {
-          alert("No JWT token found. Please log in again.");
+          showToast('No JWT token found. Please log in again.','error');
           return;
         }
 
         if (!fileInput.files || fileInput.files.length === 0) {
          // alert("Please select a file first.");
-          alert(` Please upload a ${type} file to proceed.`);
+         // alert(` Please upload a ${type} file to proceed.`);
+          showToast(` Please upload a ${type} file to proceed.`, 'error');
           return;
         }
 
@@ -554,11 +630,9 @@ async function updateNavbar() {
           .then((data) => {
             console.log("Upload successful:", data);
             hideLoading();
-            alert(
-              `${
-                type.charAt(0).toUpperCase() + type.slice(1)
-              } file uploaded successfully`
-            );
+           // alert(`${type.charAt(0).toUpperCase() + type.slice(1)} file uploaded successfully`);
+            showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} file uploaded successfully`,'success');
+
           })
           .catch((error) => {
             console.error("Error:", error);
@@ -568,10 +642,12 @@ async function updateNavbar() {
                 "JWT strings must contain exactly 2 period characters"
               )
             ) {
-              alert("Invalid token. Please log in again.");
+              //alert("Invalid token. Please log in again.");
+              showToast('Invalid token. Please log in again.','error');
               localStorage.removeItem("jwtToken");
             } else {
               alert(`Error uploading ${type} file: ${error.message}`);
+              showToast(`Error uploading ${type} file: ${error.message}`,'error');
             }
           });
       }
@@ -638,6 +714,8 @@ async function updateNavbar() {
         backgroundColor: "white",
         cameraType: "orthographic",
       });
+      //for grid
+      var gridBoxComponent;
       var stage_ligand = new NGL.Stage("view3d_lig", {
         backgroundColor: "white",
         cameraType: "orthographic",
@@ -745,14 +823,16 @@ async function updateNavbar() {
           localStorage.setItem('jobName','');
           console.log('reset jobName'+localStorage.getItem('jobName'));
           if (!jobName) {
-              alert("No job name found. Please create a new job before starting docking.");
+              //alert("No job name found. Please create a new job before starting docking.");
+              showToast('No job name found. Please create a new job before starting docking.','error');
               return;
             }
             const job = await getJobDetails(jobName);
             checkFilesUploaded(jobName)
             .then(response=>{
               if (response !== "Success:Files Uploaded") {
-                alert(response);
+                showToast(response,'success');
+
                 throw new Error( response);
               }
              // alert(response);
@@ -761,7 +841,7 @@ async function updateNavbar() {
              
            //  console.log(job);
              addJobToTable(job);
-             alert("Docking process initiated. Please wait while the operation completes.");
+             showToast('Docking process initiated. Please wait while the operation completes.','success');
              
              const sseConnection = establishSseConnection(jobName);
 
@@ -1102,6 +1182,52 @@ async function isJwtTokenValid() {
 }
 
 
+function updateGridBox() {
+    if (gridBoxComponent) {
+        stage.removeComponent(gridBoxComponent);
+    }
+
+    var centerX = parseFloat(document.getElementById("grid-center-x").value) || 0;
+    var centerY = parseFloat(document.getElementById("grid-center-y").value) || 0;
+    var centerZ = parseFloat(document.getElementById("grid-center-z").value) || 0;
+    var sizeX = Math.abs(parseFloat(document.getElementById("grid-size-x").value)) || 10;
+    var sizeY = Math.abs(parseFloat(document.getElementById("grid-size-y").value)) || 10;
+    var sizeZ = Math.abs(parseFloat(document.getElementById("grid-size-z").value)) || 10;
+    var color = document.getElementById("grid-color").value || "#ff0000";
+    color = hexToRgb(document.getElementById("grid-color").value);
+    var shape = new NGL.Shape("gridBox");
+    shape = new NGL.Shape("shape", { lineWidth: 10, aspectRatio: 10 });
+    var pos = [
+        parseFloat(x_center),
+        parseFloat(y_center),
+        parseFloat(z_center)
+      ];
+    shape.addBox(
+        [
+            [centerX - sizeX/2, centerY - sizeY/2, centerZ - sizeZ/2],
+            [centerX + sizeX/2, centerY - sizeY/2, centerZ - sizeZ/2],
+            [centerX + sizeX/2, centerY + sizeY/2, centerZ - sizeZ/2],
+            [centerX - sizeX/2, centerY + sizeY/2, centerZ - sizeZ/2],
+            [centerX - sizeX/2, centerY - sizeY/2, centerZ + sizeZ/2],
+            [centerX + sizeX/2, centerY - sizeY/2, centerZ + sizeZ/2],
+            [centerX + sizeX/2, centerY + sizeY/2, centerZ + sizeZ/2],
+            [centerX - sizeX/2, centerY + sizeY/2, centerZ + sizeZ/2]
+        ],
+        [
+            [0, 1, 2], [0, 2, 3], // Front face
+            [4, 6, 5], [4, 7, 6], // Back face
+            [0, 4, 1], [1, 4, 5], // Left face
+            [2, 6, 3], [3, 6, 7], // Right face
+            [0, 3, 4], [3, 7, 4], // Top face
+            [1, 5, 2], [2, 5, 6]  // Bottom face
+        ],
+        { color: color, opacity: 0.5 }
+    );
+
+    gridBoxComponent = stage.addComponentFromObject(shape);
+    gridBoxComponent.addRepresentation("surface");
+    stage.autoView();
+}
 </script>
   </body>
 </html>

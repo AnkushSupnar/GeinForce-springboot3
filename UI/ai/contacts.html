@@ -134,7 +134,8 @@
             .then(response => response.json())
             .then(data => {
                 console.log('Success:', data);
-                alert('Your message has been sent successfully!');
+                //alert('Your message has been sent successfully!');
+                showToast('Your message has been sent successfully!','success');
                 // Reset form
                 document.querySelector('form').reset();
                 // Reset character counter
@@ -143,7 +144,7 @@
             })
             .catch((error) => {
                 console.error('Error:', error);
-                alert('There was an error sending your message. Please try again.');
+                showToast('There was an error sending your message. Please try again.','error');
             });
         }
     </script>
@@ -262,6 +263,7 @@
         </div>
     </footer>
 
+    <script src="assets/js/toast.js"></script>
 </body>
 
 </html>

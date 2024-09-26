@@ -91,7 +91,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000; /* Ensure it's on top of other content */
+    z-index: 9999; /* Ensure it's on top of other content */
     visibility: hidden; /* Hide initially */
 }
 
@@ -447,7 +447,7 @@
             </div>
         </div>
     </footer>
-
+    <script src="assets/js/toast.js"></script>
 </body>
 <script>
 document.getElementById('terms').addEventListener('change', function() {
@@ -532,7 +532,7 @@ document.getElementById('instituteCheck').addEventListener('change', function() 
                 emptyField = input.name;
                 console.log(input.name);
                 console.log(input.value);
-                alert("Please Enter Value for " + input.name);
+                showToast('Please Enter Value for' + input.name,'error');
                 break; // Stop further iteration once the first empty field is found
             }
         }
@@ -549,25 +549,25 @@ document.getElementById('instituteCheck').addEventListener('change', function() 
         if (type === 'student-form') {
         // Check First Name
         if (document.getElementById('firstName').value.trim() === '') {
-            alert("Please Enter First Name");
+            showToast('Please Enter First Name','error');
             return false;
         }
 
         // Check Last Name
         if (document.getElementById('lastName').value.trim() === '') {
-            alert("Please Enter Last Name");
+            showToast('Please Enter Last Name','error');
             return false;
         }
 
         // Check Email
         if (document.getElementById('email').value.trim() === '') {
-            alert("Please Enter Email");
+            showToast('Please Enter Email','error');
             return false;
         }
 
         // Check Mobile
         if (document.getElementById('mobile').value.trim() === '') {
-            alert("Please Enter Mobile Number");
+            showToast('Please Enter Mobile Number','error');
             return false;
         }
 
@@ -575,50 +575,50 @@ document.getElementById('instituteCheck').addEventListener('change', function() 
         if (document.getElementById('instituteCheck').checked) {
             // If checked, check the Select Institute dropdown
             if (document.getElementById('institute').value.trim() === '') {
-                alert("Please Select Institute Name");
+                showToast('Please Select Institute Name','error');
                 return false;
             }
         } else {
             // If not checked, check the Institute ID field
             if (document.getElementById('instituteId').value.trim() === '') {
-                alert("Please Enter Institute ID");
+                showToast('Please Enter Institute ID','error');
                 return false;
             }
         }
 
         // Check Department
         if (document.getElementById('department').value.trim() === '') {
-            alert("Please Enter Department");
+            showToast('Please Enter Department','error');
             return false;
         }
 
         // Check Purpose
         if (document.getElementById('purpose').value.trim() === '') {
-            alert("Please Select Purpose");
+            showToast('Please Select Purpose','error');
             return false;
         }
 
         // Check City
         if (document.getElementById('city').value.trim() === '') {
-            alert("Please Enter City");
+            showToast('Please Enter City','error');
             return false;
         }
 
         // Check State
         if (document.getElementById('state').value.trim() === '') {
-            alert("Please Enter State");
+            showToast('Please Enter State','error');
             return false;
         }
 
         // Check Country
         if (document.getElementById('country').value.trim() === '') {
-            alert("Please Enter Country");
+            showToast('Please Enter Country','error');
             return false;
         }
 
         // Check Terms and Conditions Checkbox
         if (!document.getElementById('terms').checked) {
-            alert("You must agree to the terms and conditions");
+            showToast('You must agree to the terms and conditions','error');
             return false;
         }
 
@@ -628,35 +628,35 @@ document.getElementById('instituteCheck').addEventListener('change', function() 
     if (type === 'inst-form') {
         // Validate Institute Form Fields
         if (document.getElementById('institute_name').value.trim() === '') {
-            alert("Please Enter Institute Name");
+            showToast('Please Enter Institute Name','error');
             return false;
         }
         if (document.getElementById('institute_department').value.trim() === '') {
-            alert("Please Select Department");
+            showToast('Please Select Department','error');
             return false;
         }
         if (document.getElementById('instituteEmail').value.trim() === '') {
-            alert("Please Enter Email");
+            showToast('Please Enter Email','error');
             return false;
         }
         if (document.getElementById('instituteMobile').value.trim() === '') {
-            alert("Please Enter Mobile Number");
+            showToast('Please Enter Mobile Number','error');
             return false;
         }
         if (document.getElementById('instituteCity').value.trim() === '') {
-            alert("Please Enter City");
+            showToast('Please Enter City','error');
             return false;
         }
         if (document.getElementById('instituteState').value.trim() === '') {
-            alert("Please Enter State");
+            showToast('Please Enter State','error');
             return false;
         }
         if (document.getElementById('instituteCountry').value.trim() === '') {
-            alert("Please Enter Country");
+            showToast('Please Enter Country','error');
             return false;
         }
         if (!document.getElementById('inst-terms').checked) {
-            alert("You must agree to the terms and conditions");
+            showToast('You must agree to the terms and conditions','error');
             return false;
         }
         return true; // If all validations pass
@@ -760,7 +760,7 @@ document.getElementById('instituteCheck').addEventListener('change', function() 
      
      
      if (!data.startsWith('failed:')&& !data.startsWith('Fail:')) {
-        alert("Please enter OTP recieved in Email");
+        showToast('Please enter OTP recieved in Email','success');
      if (type === 'inst-form') {
         hideShowOTPDIV('inst-otp-div');
      }
@@ -770,7 +770,7 @@ document.getElementById('instituteCheck').addEventListener('change', function() 
      
     }
     else{
-        alert(data);
+        showToast(data,'sucess');
     }
      hideLoading();
      
@@ -778,7 +778,7 @@ document.getElementById('instituteCheck').addEventListener('change', function() 
     .catch((error) => {
         console.error('Error:', error);
         hideLoading();
-        alert('An error occurred while sending OTP');  // Handle error
+        showToast('An error occurred while sending OTP','error');  // Handle error
     });
     
 }
@@ -805,19 +805,19 @@ document.getElementById('instituteCheck').addEventListener('change', function() 
         }
         console.log(email,otp,password);
         if(otp==''){
-            alert("Please Enter OTP Recieved On Email");
+            showToast('Please Enter OTP Recieved On Email','error');
             return;
         }
         if(password==''){
-            alert("Please Enter New Password");
+            showToast('Please Enter New Password','error');
             return;
         }
         if(confirmPassword==''){
-            alert("Please Enter Confirm Password");
+            showToast('Please Enter Confirm Password','error');
             return;
         }
         if(password!=confirmPassword){
-            alert('New Password And COnfirm Password Must Be Same');
+            showToast('New Password And Confirm Password Must Be Same','error');
             return;
         }
         var payload = {
@@ -843,12 +843,12 @@ document.getElementById('instituteCheck').addEventListener('change', function() 
     .then(data => {
         console.log('Success:', data);
       //  alert('User verified successfully!');  // Handle success
-        alert("Your details have been successfully submitted. You will be able to log in once your account has been reviewed and approved by the Admin Center.");
+      showToast('Your details have been successfully submitted. You will be able to log in once your account has been reviewed and approved by the Admin Center.','success');
         window.location.assign("index.html");
     })
     .catch((error) => {
         console.error('Error:', error);
-        alert('An error occurred while verifying the user');  // Handle error
+        showToast('An error occurred while verifying the user','error');  // Handle error
     });
 
 

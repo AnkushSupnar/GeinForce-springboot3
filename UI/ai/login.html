@@ -64,7 +64,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000; /* Ensure it's on top of other content */
+    z-index: 9999; /* Ensure it's on top of other content */
     visibility: hidden; /* Hide initially */
 }
 
@@ -198,7 +198,8 @@
     </footer>
     
     
-   
+
+   <script src="assets/js/toast.js"></script>
 </body>
 
 <script>
@@ -228,22 +229,22 @@ async function login() {
             // Store the token in local storage
             localStorage.setItem('jwtToken', jsonResponse.jwt); // Changed 'token' to 'jwtToken'
             hideLoading();
-            alert("Login Success");
+            showToast('Login Success','success');
             window.location.href = 'index.html'; // Replace with your desired path
         } else if (response.status === 401) {
             hideLoading();
-            alert('Incorrect Credentials');
+            showToast('Incorrect Credentials','error');
         } else if (response.status === 404) {
             hideLoading();
-            alert('User Not Activated.');
+            showToast('User Not Activated.','error');
         } else {
             hideLoading();
-            alert('An error occurred: ' + await response.text());
+            showToast('An error occurred: ' + await response.text(),'erorr');
         }
     } catch (error) {
         console.error('Error during login:', error);
         hideLoading();
-        alert('An unexpected error occurred. Please try again later.');
+        showToast('An unexpected error occurred. Please try again later.','error');
     }
 }
 </script>
